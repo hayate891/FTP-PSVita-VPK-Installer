@@ -1,0 +1,12 @@
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Debug\ftpvitainstaller-c-sharp.exe.config
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Debug\ftpvitainstaller-c-sharp.exe
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Debug\ftpvitainstaller-c-sharp.pdb
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Debug\ftpvitainstaller-c-sharp.csprojResolveAssemblyReference.cache
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Debug\ftpvitainstaller_c_sharp.Form1.resources
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Debug\ftpvitainstaller_c_sharp.Properties.Resources.resources
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Debug\ftpvitainstaller-c-sharp.csproj.GenerateResource.Cache
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Debug\ftpvitainstaller-c-sharp.exe
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Debug\ftpvitainstaller-c-sharp.pdb
+c:\users\jllop\onedrive\documentos\visual studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Debug\SharpCompress.dll
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Debug\WinSCP.exe
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Debug\WinSCPnet.dll

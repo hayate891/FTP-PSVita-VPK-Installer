@@ -1,0 +1,11 @@
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Release\ftpvitainstaller-c-sharp.exe.config
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Release\ftpvitainstaller-c-sharp.exe
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Release\ftpvitainstaller-c-sharp.pdb
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Release\Ftp.dll
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Release\SharpCompress.dll
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\bin\Release\Ftp.xml
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Release\ftpvitainstaller_c_sharp.Form1.resources
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Release\ftpvitainstaller_c_sharp.Properties.Resources.resources
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Release\ftpvitainstaller-c-sharp.csproj.GenerateResource.Cache
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Release\ftpvitainstaller-c-sharp.exe
+C:\Users\jllop\OneDrive\Documentos\Visual Studio 2015\Projects\ftpvitainstaller-c-sharp\ftpvitainstaller-c-sharp\obj\Release\ftpvitainstaller-c-sharp.pdb
