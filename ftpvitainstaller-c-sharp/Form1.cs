@@ -63,14 +63,18 @@ namespace ftpvitainstaller_c_sharp
 
             // Get List of files in a directory recursively
 
+            Console.Write("FromPath " + frompath + " topath " + topath);
+
             foreach (string d in Directory.GetDirectories(frompath))
             {
                 foreach (string f in Directory.GetFiles(d))
                 {
                     progressLabel.Text = "Sending " + f;
 
-                    transferResult = session.PutFiles(f, topath, false, transferOptions);
-                    
+                    Console.Write("\nUploading " + f + " -> " + topath + f.Replace(@"c:\temp\data\", "").Replace(@"\", "/") + "\n");
+
+                    transferResult = session.PutFiles(f, topath + f.Replace(@"c:\temp\data\", "").Replace(@"\", "/"), false, transferOptions);
+
                     // Throw on any error
                     transferResult.Check();
 
@@ -95,7 +99,7 @@ namespace ftpvitainstaller_c_sharp
             foreach (string d in Directory.GetDirectories(path))
             {
                 foreach (string f in Directory.GetFiles(d))
-                {                    
+                {
                     number_files_to_upload++;
 
                 }
@@ -203,6 +207,8 @@ namespace ftpvitainstaller_c_sharp
                 {
 
                     session.FileTransferProgress += SessionFileTransferProgress;
+                    
+                    session.Timeout = new TimeSpan(0, 3, 30);
 
                     // Connect
                     session.Open(sessionOptions);
@@ -228,52 +234,14 @@ namespace ftpvitainstaller_c_sharp
                         Console.WriteLine("Upload of {0} succeeded", transfer.FileName);
 
                     }
-                    statusLabel.Text = "Install the VPK at ux0:/VPKs/";
                     progressBar1.Value = 50;
                     DialogResult result;
-                    result = MessageBox.Show("Please go to ux0:/VPKs on the PSVita and install the installer.vpk file, then click OK. \n\nATTENTION! ONLY press OK when the installation is complete.", "Installer", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-                    if (result == System.Windows.Forms.DialogResult.OK)
-                    {
 
-                        session.RemoveFiles("ux0:/VPKs/installer.vpk");
+                    statusLabel.Text = "Installing VPK...";
 
-                        // Transfer data files
-                        statusLabel.Text = "Installing, please wait...";
-                        progressBar1.Value = 75;
-
-                        string apppath = "ux0:/app/" + param.TitleID + "/";
-
-                        files_uploaded = 0;
-                        number_files_to_upload = 0;
-
-                        progressBar1.Value = 0;
-                        CountNumberFilesInPath(@"c:\temp\data\");            
-                        SendFilesFromDirectory(@"c:\temp\data\", apppath, number_files_to_upload);
-                       
-                        MessageBox.Show(param.Title + " installed successfully.", "Congrats!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        progressBar1.Value = 100;
-                        statusLabel.Text = "Completed!";
-                        button2.Enabled = true;
-
-                        // Clean temp directory
-                        Directory.Delete(@"C:/temp", true);
-
-                        progressLabel.Text = "";
-
-
-                    }
-                    else
-                    {
-                        button2.Enabled = true;
-                        statusLabel.Text = "Installation aborted.";
-                        if (Directory.Exists(@"C:/temp"))
-                        {
-                            Console.Write("Temp directory deleted");
-                            Directory.Delete(@"C:/temp", true);
-                        }
-                        return;
-                    }
-
+                    // Auto-install VPK
+                    session.ExecuteCommand("PROM ux0:/VPKs/installer.vpk");
+                    Console.Write("\n VPK Installed \n");
                 }
             }
             catch (Exception ex)
@@ -283,13 +251,66 @@ namespace ftpvitainstaller_c_sharp
                 progressBar1.Value = 0;
                 button2.Enabled = true;
                 progressLabel.Text = "";
-                if (Directory.Exists(@"C:/temp"))
+
+            }
+
+            // UPLOAD DATA
+            try
+            {
+                // Setup session options
+                sessionOptions = new SessionOptions
                 {
-                    Console.Write("Temp directory deleted");
-                    Directory.Delete(@"C:/temp", true);
+                    Protocol = Protocol.Ftp,
+                    HostName = ipBox.Text,
+                    PortNumber = Convert.ToInt32(portBox.Text),
+                    UserName = "anonymous",
+                    Password = ""
+                };
+
+                using (session = new Session())
+                {
+
+                    session.FileTransferProgress += SessionFileTransferProgress;
+                    session.Open(sessionOptions);
+                    session.RemoveFiles("ux0:/VPKs/installer.vpk");
+
+                    // Transfer data files
+                    statusLabel.Text = "Installing, please wait...";
+                    progressBar1.Value = 75;
+
+                    string apppath = "/ux0:/app/" + param.TitleID + "/";
+
+                    files_uploaded = 0;
+                    number_files_to_upload = 0;
+
+                    progressBar1.Value = 0;
+                    CountNumberFilesInPath(@"c:\temp\data\");
+                    SendFilesFromDirectory(@"c:\temp\data\", apppath, number_files_to_upload);
+
+                    MessageBox.Show(param.Title + " installed successfully.", "Congrats!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    progressBar1.Value = 100;
+                    statusLabel.Text = "Completed!";
+                     button2.Enabled = true;
+
+                     // Clean temp directory
+                     Directory.Delete(@"C:/temp", true);
+
+                  progressLabel.Text = "";
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: {0}", ex);
+                Console.Write("\n ERROR UPLOADING DATA \n");
+                statusLabel.Text = "CONNECTION ERROR";
+                progressBar1.Value = 0;
+                button2.Enabled = true;
+                progressLabel.Text = "";
+
+            }
+
         }
+        
 
         private void SessionFileTransferProgress(object sender, FileTransferProgressEventArgs e)
         {
@@ -315,6 +336,29 @@ namespace ftpvitainstaller_c_sharp
         {
             ini_file.Sections["Configuration"].Keys["Port"].Value = portBox.Text;
             ini_file.Save("config.ini");
+        }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+            // Donation Button
+
+            System.Diagnostics.Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMFDRTBU49E8E");
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMFDRTBU49E8E");
+
+        }
+
+        private void Form1_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            //Remove temp data
+            if (Directory.Exists(@"C:/temp"))
+            {
+                Console.Write("Temp directory deleted");
+                Directory.Delete(@"C:/temp", true);
+            }
         }
     }
 }
