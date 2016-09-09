@@ -4,6 +4,14 @@ Welcome to FTP PSVita VPK Installer!
 ![Banner](https://s10.postimg.org/ml08irlhl/banner.png)
 [![Build Status](https://travis-ci.org/Llop1s/FTP-PSVita-VPK-Installer.svg?branch=master)](https://travis-ci.org/Llop1s/FTP-PSVita-VPK-Installer) [![Twitter](https://img.shields.io/badge/twitter-@llopis14-blue.svg?style=flat)](http://twitter.com/llopis14)
 
+##Changelog
+
+###Beta2.0
+- [x] Now the installer.vpk is deleted after you install it.
+- [x] Added second progress bar with the progress of the current file upload.
+- [x] Added text with the current file uploading.
+- [x] Now the program remembers your PSVita IP and Port.
+
 ##Features
 
 - [x] Install VPK files without using the double of space.
