@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MadMilkman.Ini, Version=1.0.6.0, Culture=neutral, PublicKeyToken=4e0b5157a7ffbb74, processorArchitecture=MSIL">
+      <HintPath>..\packages\MadMilkman.Ini.1.0.6.0\lib\net20\MadMilkman.Ini.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SharpCompress, Version=0.12.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpCompress.0.12.4\lib\net45\SharpCompress.dll</HintPath>
       <Private>True</Private>
@@ -60,6 +64,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="LogForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogForm.Designer.cs">
+      <DependentUpon>LogForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Functions.cs" />
     <Compile Include="Resources\PARAMSFO.cs" />
     <Compile Include="Program.cs" />
@@ -67,6 +77,9 @@
     <Compile Include="Resources\SecureFileInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LogForm.resx">
+      <DependentUpon>LogForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

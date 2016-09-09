@@ -35,6 +35,8 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.fileSizeLabel = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.progressBar2 = new System.Windows.Forms.ProgressBar();
+            this.progressLabel = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -103,6 +105,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.progressBar2);
+            this.groupBox1.Controls.Add(this.progressLabel);
             this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.statusLabel);
             this.groupBox1.Controls.Add(this.label3);
@@ -112,10 +116,27 @@
             this.groupBox1.Controls.Add(this.progressBar1);
             this.groupBox1.Location = new System.Drawing.Point(13, 256);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(303, 195);
+            this.groupBox1.Size = new System.Drawing.Size(303, 211);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Connection";
+            // 
+            // progressBar2
+            // 
+            this.progressBar2.Location = new System.Drawing.Point(6, 163);
+            this.progressBar2.Name = "progressBar2";
+            this.progressBar2.Size = new System.Drawing.Size(285, 10);
+            this.progressBar2.TabIndex = 8;
+            // 
+            // progressLabel
+            // 
+            this.progressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.progressLabel.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.progressLabel.Location = new System.Drawing.Point(6, 176);
+            this.progressLabel.Name = "progressLabel";
+            this.progressLabel.Size = new System.Drawing.Size(285, 32);
+            this.progressLabel.TabIndex = 7;
+            this.progressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // button2
             // 
@@ -152,6 +173,7 @@
             this.portBox.Size = new System.Drawing.Size(55, 20);
             this.portBox.TabIndex = 3;
             this.portBox.Text = "1337";
+            this.portBox.TextChanged += new System.EventHandler(this.portBox_TextChanged);
             // 
             // label2
             // 
@@ -169,6 +191,7 @@
             this.ipBox.Size = new System.Drawing.Size(143, 20);
             this.ipBox.TabIndex = 1;
             this.ipBox.Text = "192.168.1.25";
+            this.ipBox.TextChanged += new System.EventHandler(this.ipBox_TextChanged);
             // 
             // progressBar1
             // 
@@ -186,13 +209,13 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(327, 464);
+            this.ClientSize = new System.Drawing.Size(327, 479);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.GameGroupBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "PSVita FTP Game Installer";
+            this.Text = "PSVita FTP VPK Installer";
             this.GameGroupBox.ResumeLayout(false);
             this.GameGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -218,6 +241,8 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Label fileSizeLabel;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Label progressLabel;
+        private System.Windows.Forms.ProgressBar progressBar2;
     }
 }
 

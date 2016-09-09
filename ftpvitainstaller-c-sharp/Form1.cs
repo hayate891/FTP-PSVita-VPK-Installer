@@ -15,6 +15,7 @@ using SharpCompress.Archive.Zip;
 using WinSCP;
 using PeXploit;
 using System.IO;
+using MadMilkman.Ini;
 
 
 namespace ftpvitainstaller_c_sharp
@@ -23,16 +24,88 @@ namespace ftpvitainstaller_c_sharp
     {
 
         private PARAM_SFO param;
+        private SessionOptions sessionOptions;
+        private Session session;
+        private TransferOperationResult transferResult;
+        private TransferOptions transferOptions;
+        private int number_files_to_upload = 0;
+        private int files_uploaded = 0;
+        private IniFile ini_file;
 
         public Form1()
         {
             InitializeComponent();
             progressBar1.Value = 0;
             button2.Enabled = false;
+
+            // Load config.ini
+
+            if (!File.Exists(@"config.ini"))
+            {                
+                ini_file = new IniFile();
+                IniSection section = ini_file.Sections.Add("Configuration");
+                IniKey key = section.Keys.Add("IP", "192.168.1.");
+                IniKey keyport = section.Keys.Add("Port", "1337");
+                ini_file.Save("config.ini");
+            } else
+            {
+                ini_file = new IniFile();
+                ini_file.Load(@"config.ini");
+            }
+
+            ipBox.Text = ini_file.Sections["Configuration"].Keys["IP"].Value;
+            portBox.Text = ini_file.Sections["Configuration"].Keys["Port"].Value;  
+
+        }
+
+        private void SendFilesFromDirectory(string frompath, string topath, int num_files)
+        {
+
+            // Get List of files in a directory recursively
+
+            foreach (string d in Directory.GetDirectories(frompath))
+            {
+                foreach (string f in Directory.GetFiles(d))
+                {
+                    progressLabel.Text = "Sending " + f;
+
+                    transferResult = session.PutFiles(f, topath, false, transferOptions);
+                    
+                    // Throw on any error
+                    transferResult.Check();
+
+                    // Print results
+                    foreach (TransferEventArgs transfer in transferResult.Transfers)
+                    {
+                        Console.WriteLine("Upload of {0} succeeded", transfer.FileName);
+                        files_uploaded++;
+                        progressBar1.Value = (100 / number_files_to_upload) * files_uploaded;
+                    }
+
+                }
+                SendFilesFromDirectory(d, topath, number_files_to_upload);
+            }
+        }
+
+        private void CountNumberFilesInPath(string path)
+        {
+
+            // Get List of files in a directory recursively
+
+            foreach (string d in Directory.GetDirectories(path))
+            {
+                foreach (string f in Directory.GetFiles(d))
+                {                    
+                    number_files_to_upload++;
+
+                }
+                CountNumberFilesInPath(d);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            statusLabel.Text = "Reading File...";
             if (Directory.Exists(@"C:/temp"))
             {
                 Console.Write("Temp directory deleted");
@@ -42,6 +115,7 @@ namespace ftpvitainstaller_c_sharp
             openFileDialog1.Filter = "VPK Files |*.vpk|Zip Files |*.zip";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
+                
                 gameNameLabel.Text = openFileDialog1.FileName;
                 bool isvpk = false;
                 if (openFileDialog1.FileName.Contains(".vpk"))
@@ -52,7 +126,7 @@ namespace ftpvitainstaller_c_sharp
                 }
                 var archive = ArchiveFactory.Open(openFileDialog1.FileName);
                 fileSizeLabel.Text = "File Size: " + archive.TotalSize + " bytes";
-                statusLabel.Text = "Reading File...";
+                
                 foreach (var file_ in archive.Entries)
                 {
 
@@ -97,7 +171,6 @@ namespace ftpvitainstaller_c_sharp
         private void Install()
         {
             // CREATE VPK
-            this.button2.Enabled = false;
             statusLabel.Text = @"Creating .vpk...";
 
             using (var archive = ZipArchive.Create())
@@ -117,7 +190,7 @@ namespace ftpvitainstaller_c_sharp
             try
             {
                 // Setup session options
-                SessionOptions sessionOptions = new SessionOptions
+                sessionOptions = new SessionOptions
                 {
                     Protocol = Protocol.Ftp,
                     HostName = ipBox.Text,
@@ -126,22 +199,29 @@ namespace ftpvitainstaller_c_sharp
                     Password = ""
                 };
 
-                using (Session session = new Session())
+                using (session = new Session())
                 {
+
+                    session.FileTransferProgress += SessionFileTransferProgress;
+
                     // Connect
                     session.Open(sessionOptions);
+
+                    // Show Log
+                    //var t = new Thread(new ThreadStart(this.ShowLog));
+                    //t.Start();
+
                     statusLabel.Text = "Connected";
                     // Upload files
-                    TransferOptions transferOptions = new TransferOptions();
+                    transferOptions = new TransferOptions();
                     transferOptions.TransferMode = TransferMode.Binary;
-
-                    TransferOperationResult transferResult;
+                                      
                     statusLabel.Text = "Copying installer...";
                     transferResult = session.PutFiles(@"c:\temp\installer.vpk", "ux0:/VPKs/", false, transferOptions);
 
                     // Throw on any error
                     transferResult.Check();
-
+                    
                     // Print results
                     foreach (TransferEventArgs transfer in transferResult.Transfers)
                     {
@@ -154,21 +234,22 @@ namespace ftpvitainstaller_c_sharp
                     result = MessageBox.Show("Please go to ux0:/VPKs on the PSVita and install the installer.vpk file, then click OK. \n\nATTENTION! ONLY press OK when the installation is complete.", "Installer", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                     if (result == System.Windows.Forms.DialogResult.OK)
                     {
+
+                        session.RemoveFiles("ux0:/VPKs/installer.vpk");
+
                         // Transfer data files
                         statusLabel.Text = "Installing, please wait...";
                         progressBar1.Value = 75;
-                        transferResult = session.PutFiles(@"c:\temp\data\*", "ux0:/app/" + param.TitleID + "/", false, transferOptions);
 
-                        // Throw on any error
-                        transferResult.Check();
+                        string apppath = "ux0:/app/" + param.TitleID + "/";
 
-                        // Print results
-                        foreach (TransferEventArgs transfer in transferResult.Transfers)
-                        {
-                            Console.WriteLine("Upload of {0} succeeded", transfer.FileName);
-                            
-                            
-                        }
+                        files_uploaded = 0;
+                        number_files_to_upload = 0;
+
+                        progressBar1.Value = 0;
+                        CountNumberFilesInPath(@"c:\temp\data\");            
+                        SendFilesFromDirectory(@"c:\temp\data\", apppath, number_files_to_upload);
+                       
                         MessageBox.Show(param.Title + " installed successfully.", "Congrats!", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         progressBar1.Value = 100;
                         statusLabel.Text = "Completed!";
@@ -176,11 +257,20 @@ namespace ftpvitainstaller_c_sharp
 
                         // Clean temp directory
                         Directory.Delete(@"C:/temp", true);
+
+                        progressLabel.Text = "";
+
+
                     }
                     else
                     {
                         button2.Enabled = true;
                         statusLabel.Text = "Installation aborted.";
+                        if (Directory.Exists(@"C:/temp"))
+                        {
+                            Console.Write("Temp directory deleted");
+                            Directory.Delete(@"C:/temp", true);
+                        }
                         return;
                     }
 
@@ -192,9 +282,40 @@ namespace ftpvitainstaller_c_sharp
                 statusLabel.Text = "CONNECTION ERROR";
                 progressBar1.Value = 0;
                 button2.Enabled = true;
+                progressLabel.Text = "";
+                if (Directory.Exists(@"C:/temp"))
+                {
+                    Console.Write("Temp directory deleted");
+                    Directory.Delete(@"C:/temp", true);
+                }
             }
         }
 
+        private void SessionFileTransferProgress(object sender, FileTransferProgressEventArgs e)
+        {
+            // Print transfer progress            
+            progressBar2.Value = (int)(e.FileProgress * 100);
+            Console.Write("\r{0} ({1})", e.FileName, e.FileProgress);
+
+        }
+
+        private void ShowLog()
+        {
+            LogForm logf = new LogForm();
+            logf.Show();
+        }
+
+        private void ipBox_TextChanged(object sender, EventArgs e)
+        {
+            ini_file.Sections["Configuration"].Keys["IP"].Value = ipBox.Text;
+            ini_file.Save("config.ini");
+        }
+
+        private void portBox_TextChanged(object sender, EventArgs e)
+        {
+            ini_file.Sections["Configuration"].Keys["Port"].Value = portBox.Text;
+            ini_file.Save("config.ini");
+        }
     }
 }
 
