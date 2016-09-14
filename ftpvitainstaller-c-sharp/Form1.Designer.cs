@@ -36,7 +36,6 @@
             this.fileSizeLabel = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.progressBar2 = new System.Windows.Forms.ProgressBar();
-            this.progressLabel = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -44,6 +43,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.ipBox = new System.Windows.Forms.TextBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.progressLabel = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
@@ -109,7 +109,6 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.progressBar2);
-            this.groupBox1.Controls.Add(this.progressLabel);
             this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.statusLabel);
             this.groupBox1.Controls.Add(this.label3);
@@ -117,33 +116,24 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.ipBox);
             this.groupBox1.Controls.Add(this.progressBar1);
+            this.groupBox1.Controls.Add(this.progressLabel);
             this.groupBox1.Location = new System.Drawing.Point(13, 256);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(303, 211);
+            this.groupBox1.Size = new System.Drawing.Size(303, 268);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Connection";
+            this.groupBox1.Text = "Options";
             // 
             // progressBar2
             // 
-            this.progressBar2.Location = new System.Drawing.Point(6, 163);
+            this.progressBar2.Location = new System.Drawing.Point(6, 217);
             this.progressBar2.Name = "progressBar2";
             this.progressBar2.Size = new System.Drawing.Size(285, 10);
             this.progressBar2.TabIndex = 8;
             // 
-            // progressLabel
-            // 
-            this.progressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.progressLabel.ForeColor = System.Drawing.SystemColors.ControlDark;
-            this.progressLabel.Location = new System.Drawing.Point(6, 176);
-            this.progressLabel.Name = "progressLabel";
-            this.progressLabel.Size = new System.Drawing.Size(285, 32);
-            this.progressLabel.TabIndex = 7;
-            this.progressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(6, 58);
+            this.button2.Location = new System.Drawing.Point(6, 94);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(285, 40);
             this.button2.TabIndex = 6;
@@ -154,7 +144,7 @@
             // statusLabel
             // 
             this.statusLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.statusLabel.Location = new System.Drawing.Point(6, 101);
+            this.statusLabel.Location = new System.Drawing.Point(4, 137);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(285, 35);
             this.statusLabel.TabIndex = 5;
@@ -198,11 +188,21 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(6, 139);
+            this.progressBar1.Location = new System.Drawing.Point(6, 174);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(285, 23);
+            this.progressBar1.Size = new System.Drawing.Size(285, 37);
             this.progressBar1.TabIndex = 0;
             this.progressBar1.Value = 50;
+            // 
+            // progressLabel
+            // 
+            this.progressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.progressLabel.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.progressLabel.Location = new System.Drawing.Point(6, 230);
+            this.progressLabel.Name = "progressLabel";
+            this.progressLabel.Size = new System.Drawing.Size(285, 32);
+            this.progressLabel.TabIndex = 7;
+            this.progressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // openFileDialog1
             // 
@@ -211,7 +211,7 @@
             // pictureBox2
             // 
             this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(13, 468);
+            this.pictureBox2.Location = new System.Drawing.Point(12, 530);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(24, 23);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -221,7 +221,7 @@
             // 
             // linkLabel1
             // 
-            this.linkLabel1.Location = new System.Drawing.Point(43, 468);
+            this.linkLabel1.Location = new System.Drawing.Point(42, 530);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(45, 23);
             this.linkLabel1.TabIndex = 5;
@@ -234,11 +234,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(327, 503);
+            this.ClientSize = new System.Drawing.Size(327, 562);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.GameGroupBox);
+            this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";

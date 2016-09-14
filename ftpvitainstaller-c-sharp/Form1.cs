@@ -24,13 +24,10 @@ namespace ftpvitainstaller_c_sharp
     {
 
         private PARAM_SFO param;
-        private SessionOptions sessionOptions;
-        private Session session;
-        private TransferOperationResult transferResult;
-        private TransferOptions transferOptions;
         private int number_files_to_upload = 0;
         private int files_uploaded = 0;
         private IniFile ini_file;
+        private bool rip_manual_ = false;
 
         public Form1()
         {
@@ -60,31 +57,77 @@ namespace ftpvitainstaller_c_sharp
 
         private void SendFilesFromDirectory(string frompath, string topath, int num_files)
         {
+        SessionOptions sessionOptions;
+        Session session;
+        TransferOperationResult transferResult;
+        TransferOptions transferOptions;
 
-            // Get List of files in a directory recursively
+        // Get List of files in a directory recursively
 
-            Console.Write("FromPath " + frompath + " topath " + topath);
+        Console.Write("FromPath " + frompath + " topath " + topath);
 
             foreach (string d in Directory.GetDirectories(frompath))
             {
                 foreach (string f in Directory.GetFiles(d))
                 {
-                    progressLabel.Text = "Sending " + f;
+                    this.Invoke(new Action<string>(progressLabel_ChangeText), "Sending " + f);
 
                     Console.Write("\nUploading " + f + " -> " + topath + f.Replace(@"c:\temp\data\", "").Replace(@"\", "/") + "\n");
 
-                    transferResult = session.PutFiles(f, topath + f.Replace(@"c:\temp\data\", "").Replace(@"\", "/"), false, transferOptions);
-
-                    // Throw on any error
-                    transferResult.Check();
-
-                    // Print results
-                    foreach (TransferEventArgs transfer in transferResult.Transfers)
+                    try
                     {
-                        Console.WriteLine("Upload of {0} succeeded", transfer.FileName);
-                        files_uploaded++;
-                        progressBar1.Value = (100 / number_files_to_upload) * files_uploaded;
+                        // Setup session options
+                        sessionOptions = new SessionOptions
+                        {
+                            Protocol = Protocol.Ftp,
+                            HostName = ipBox.Text,
+                            PortNumber = Convert.ToInt32(portBox.Text),
+                            UserName = "anonymous",
+                            Password = ""
+                        };
+
+                        using (session = new Session())
+                        {
+                            session.FileTransferProgress += SessionFileTransferProgress;
+
+                            session.Timeout = new TimeSpan(0, 3, 30);
+
+                            // Connect
+                            session.Open(sessionOptions);
+
+                            transferOptions = new TransferOptions();
+                            transferOptions.TransferMode = TransferMode.Binary;
+
+                            transferResult = session.PutFiles(f, topath + f.Replace(@"c:\temp\data\", "").Replace(@"\", "/"), true, transferOptions);
+                            // Throw on any error
+                            transferResult.Check();
+
+                            this.Invoke(new Action<string>(statusLabel_ChangeText), "Installing...");
+
+                            // Print results
+                            foreach (TransferEventArgs transfer in transferResult.Transfers)
+                            {
+                                Console.WriteLine("\nUpload of {0} succeeded", transfer.FileName);
+                                this.Invoke(new Action<int>(numberFilesUploaded_Change), getNumberFilesUploaded() + 1);                                
+                                this.Invoke(new Action<int>(progressBar1_ChangeValue), (100 / number_files_to_upload) * files_uploaded);
+                            }
+
+                            session.Close();
+                        }
+                        
                     }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error: {0}", ex);
+                        Console.WriteLine("Error: {0}", ex);
+                        this.Invoke(new Action<string>(statusLabel_ChangeText), @"ERROR");
+                        this.Invoke(new Action<int>(progressBar1_ChangeValue), 0);
+                        this.Invoke(new Action<bool>(button2_ChangeState), true);
+                        this.Invoke(new Action<string>(progressLabel_ChangeText), @"");
+                        MessageBox.Show(ex.Message, "error");
+
+                    }
+                    
 
                 }
                 SendFilesFromDirectory(d, topath, number_files_to_upload);
@@ -100,8 +143,7 @@ namespace ftpvitainstaller_c_sharp
             {
                 foreach (string f in Directory.GetFiles(d))
                 {
-                    number_files_to_upload++;
-
+                    this.Invoke(new Action<int>(numberFilestoUpload_Change), getNumberFilesToUpload() + 1);
                 }
                 CountNumberFilesInPath(d);
             }
@@ -119,7 +161,16 @@ namespace ftpvitainstaller_c_sharp
             openFileDialog1.Filter = "VPK Files |*.vpk|Zip Files |*.zip";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                
+
+                DialogResult dialogResult = MessageBox.Show("Do you want to rip the game manual?", "Manual Rip", MessageBoxButtons.YesNo);
+
+                rip_manual_ = false;
+
+                if (dialogResult == DialogResult.Yes)
+                {
+                    rip_manual_ = true;
+                }
+
                 gameNameLabel.Text = openFileDialog1.FileName;
                 bool isvpk = false;
                 if (openFileDialog1.FileName.Contains(".vpk"))
@@ -136,7 +187,14 @@ namespace ftpvitainstaller_c_sharp
 
                     if (file_.Key.Contains("sce_sys") || file_.Key == "eboot.bin")
                     {
-                        file_.WriteToDirectory(@"C:\temp\install", ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+                        if (rip_manual_ && file_.Key.Contains("manual"))
+                        {
+                            Console.Write("\nManual File Ripped");
+                        } else
+                        {
+                            file_.WriteToDirectory(@"C:\temp\install", ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+                        }
+                        
                     }
                     else
                     {
@@ -168,14 +226,71 @@ namespace ftpvitainstaller_c_sharp
         private void button2_Click(object sender, EventArgs e)
         {
 
-            Install();
+            Thread t = new Thread(new ThreadStart(Install));
+            t.Start();
 
+        }
+
+        public void statusLabel_ChangeText(string text)
+        {
+            statusLabel.Text = text;
+        }
+
+        public void progressBar2_ChangeValue(int value)
+        {
+            progressBar2.Value = value;
+        }
+
+        public void progressLabel_ChangeText(string text)
+        {
+            progressLabel.Text = text;
+        }
+
+        public void progressBar1_ChangeValue(int value)
+        {
+            progressBar1.Value = value;
+        }
+
+        public void button1_ChangeState(bool state)
+        {
+            button1.Enabled = state;
+        }
+
+        public void button2_ChangeState(bool state)
+        {
+            button2.Enabled = state;
+        }
+
+        public void numberFilesUploaded_Change(int value)
+        {
+            files_uploaded = value;
+        }
+
+        public void numberFilestoUpload_Change(int value)
+        {
+            number_files_to_upload = value;
+        }
+
+        public int getNumberFilesToUpload()
+        {
+            return number_files_to_upload;
+        }
+
+        public int getNumberFilesUploaded()
+        {
+            return files_uploaded;
         }
 
         private void Install()
         {
+            SessionOptions sessionOptions;
+            Session session;
+            TransferOperationResult transferResult;
+            TransferOptions transferOptions;
             // CREATE VPK
-            statusLabel.Text = @"Creating .vpk...";
+            this.Invoke(new Action<string>(statusLabel_ChangeText), @"Creating .vpk...");
+            this.Invoke(new Action<bool>(button2_ChangeState), false);
+            this.Invoke(new Action<bool>(button1_ChangeState), false);
 
             using (var archive = ZipArchive.Create())
             {
@@ -183,14 +298,14 @@ namespace ftpvitainstaller_c_sharp
                 archive.SaveTo(@"C:\\temp\\installer.vpk", CompressionType.None);
             }
 
-            statusLabel.Text = @"VPK Created";
-            progressBar1.Value = 25;
+            this.Invoke(new Action<string>(statusLabel_ChangeText), @"VPK Created");
+            this.Invoke(new Action<int>(progressBar1_ChangeValue), 25);            
 
             System.Threading.Thread.Sleep(1000);
 
             // TRANSFER VPK
 
-            statusLabel.Text = "Connecting...";
+            this.Invoke(new Action<string>(statusLabel_ChangeText), @"Connecting...");
             try
             {
                 // Setup session options
@@ -206,24 +321,23 @@ namespace ftpvitainstaller_c_sharp
                 using (session = new Session())
                 {
 
-                    session.FileTransferProgress += SessionFileTransferProgress;
-                    
-                    session.Timeout = new TimeSpan(0, 3, 30);
+                    session.FileTransferProgress += SessionFileTransferProgress;                    
 
                     // Connect
                     session.Open(sessionOptions);
+                    session.Timeout = TimeSpan.FromSeconds(120000);
 
                     // Show Log
                     //var t = new Thread(new ThreadStart(this.ShowLog));
                     //t.Start();
 
-                    statusLabel.Text = "Connected";
+                    this.Invoke(new Action<string>(statusLabel_ChangeText), @"Connected");
                     // Upload files
                     transferOptions = new TransferOptions();
                     transferOptions.TransferMode = TransferMode.Binary;
-                                      
-                    statusLabel.Text = "Copying installer...";
-                    transferResult = session.PutFiles(@"c:\temp\installer.vpk", "ux0:/VPKs/", false, transferOptions);
+
+                    this.Invoke(new Action<string>(statusLabel_ChangeText), @"Copying Installer...");
+                    transferResult = session.PutFiles(@"c:\temp\installer.vpk", "ux0:/VPKs/", true, transferOptions);
 
                     // Throw on any error
                     transferResult.Check();
@@ -234,23 +348,27 @@ namespace ftpvitainstaller_c_sharp
                         Console.WriteLine("Upload of {0} succeeded", transfer.FileName);
 
                     }
-                    progressBar1.Value = 50;
-                    DialogResult result;
+                    this.Invoke(new Action<int>(progressBar1_ChangeValue), 50);
 
-                    statusLabel.Text = "Installing VPK...";
+                    this.Invoke(new Action<string>(statusLabel_ChangeText), @"Installing VPK...");
 
                     // Auto-install VPK
+                    Console.Write("\n PROMOTING INSTALLER.VPK! \n");
                     session.ExecuteCommand("PROM ux0:/VPKs/installer.vpk");
-                    Console.Write("\n VPK Installed \n");
+
+                    
+                    session.Close();
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error: {0}", ex);
-                statusLabel.Text = "CONNECTION ERROR";
-                progressBar1.Value = 0;
-                button2.Enabled = true;
-                progressLabel.Text = "";
+                this.Invoke(new Action<string>(statusLabel_ChangeText), @"ERROR");
+                this.Invoke(new Action<int>(progressBar1_ChangeValue), 0);
+                this.Invoke(new Action<bool>(button2_ChangeState), true);
+                this.Invoke(new Action<string>(progressLabel_ChangeText), @"");
+                this.Invoke(new Action<bool>(button1_ChangeState), true);
+                MessageBox.Show(ex.Message, "error");
 
             }
 
@@ -269,53 +387,72 @@ namespace ftpvitainstaller_c_sharp
 
                 using (session = new Session())
                 {
-
                     session.FileTransferProgress += SessionFileTransferProgress;
                     session.Open(sessionOptions);
+                    bool vpkinstalled = false;
+
+                    while (!vpkinstalled)
+                    {
+                        if (session.FileExists("ux0:/app/" + param.TitleID + "/eboot.bin"))
+                        {
+                            vpkinstalled = true;
+                        }
+                    }
+
+                    Console.Write("\n VPK Installed \n");
+                    
                     session.RemoveFiles("ux0:/VPKs/installer.vpk");
+                   
+                    if (Directory.Exists("C:\\temp\\install")) {
+                        Console.Write("\nTemp install directory deleted");
+                        Directory.Delete(@"C:/temp/install", true);
+                    }
 
-                    // Transfer data files
-                    statusLabel.Text = "Installing, please wait...";
-                    progressBar1.Value = 75;
+                    session.Close();
 
-                    string apppath = "/ux0:/app/" + param.TitleID + "/";
-
-                    files_uploaded = 0;
-                    number_files_to_upload = 0;
-
-                    progressBar1.Value = 0;
-                    CountNumberFilesInPath(@"c:\temp\data\");
-                    SendFilesFromDirectory(@"c:\temp\data\", apppath, number_files_to_upload);
-
-                    MessageBox.Show(param.Title + " installed successfully.", "Congrats!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    progressBar1.Value = 100;
-                    statusLabel.Text = "Completed!";
-                     button2.Enabled = true;
-
-                     // Clean temp directory
-                     Directory.Delete(@"C:/temp", true);
-
-                  progressLabel.Text = "";
                 }
             }
             catch (Exception ex)
-            {
-                Console.WriteLine("Error: {0}", ex);
+            {                
                 Console.Write("\n ERROR UPLOADING DATA \n");
-                statusLabel.Text = "CONNECTION ERROR";
-                progressBar1.Value = 0;
-                button2.Enabled = true;
-                progressLabel.Text = "";
-
+                Console.WriteLine("Error: {0}", ex);
+                this.Invoke(new Action<string>(statusLabel_ChangeText), @"ERROR");
+                this.Invoke(new Action<int>(progressBar1_ChangeValue), 0);
+                this.Invoke(new Action<bool>(button2_ChangeState), true);
+                this.Invoke(new Action<string>(progressLabel_ChangeText), @"");
+                this.Invoke(new Action<bool>(button1_ChangeState), true);
+                MessageBox.Show(ex.Message, "error");
             }
+
+            string apppath = "/ux0:/app/" + param.TitleID + "/";
+
+            this.Invoke(new Action<int>(numberFilesUploaded_Change), 0);
+            this.Invoke(new Action<int>(numberFilestoUpload_Change), 0);
+            
+            this.Invoke(new Action<int>(progressBar1_ChangeValue), 0);
+
+            CountNumberFilesInPath(@"c:\temp\");
+            SendFilesFromDirectory(@"c:\temp\", apppath, number_files_to_upload);
+
+            MessageBox.Show(param.Title + " installed successfully.", "Congrats!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            this.Invoke(new Action<int>(progressBar1_ChangeValue), 100);
+            this.Invoke(new Action<string>(statusLabel_ChangeText), @"Completed");
+            this.Invoke(new Action<bool>(button2_ChangeState), true);
+            this.Invoke(new Action<bool>(button1_ChangeState), true);
+
+            // Clean temp directory
+            Directory.Delete(@"C:/temp", true);
+
+            this.Invoke(new Action<string>(progressLabel_ChangeText), @"");
+
+
 
         }
         
-
         private void SessionFileTransferProgress(object sender, FileTransferProgressEventArgs e)
         {
-            // Print transfer progress            
-            progressBar2.Value = (int)(e.FileProgress * 100);
+            // Print transfer progress           
+            this.Invoke(new Action<int>(progressBar2_ChangeValue), (int)(e.FileProgress * 100));
             Console.Write("\r{0} ({1})", e.FileName, e.FileProgress);
 
         }
