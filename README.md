@@ -7,6 +7,7 @@ Welcome to FTP PSVita VPK Installer!
 ##Changelog
 
 ###Beta 3.0
+- [x] Now the installer.vpk is installed automatically
 - [x] Performance Improved
 - [x] You can move/minimize the application while is installing
 - [x] When you open a game you'll be asked to rip the manual (this can make the game thinner, for example, Tearaway is 180MB thinner).
