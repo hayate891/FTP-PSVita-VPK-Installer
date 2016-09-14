@@ -6,7 +6,13 @@ Welcome to FTP PSVita VPK Installer!
 
 ##Changelog
 
-###Beta2.0
+###Beta 3.0
+- [x] Performance Improved
+- [x] You can move/minimize the application while is installing
+- [x] When you open a game you'll be asked to rip the manual (this can make the game thinner, for example, Tearaway is 180MB thinner).
+- [x] Bug fixes with paths and file uploads.
+
+###Beta 2.0
 - [x] Now the installer.vpk is deleted after you install it.
 - [x] Added second progress bar with the progress of the current file upload.
 - [x] Added text with the current file uploading.
@@ -38,10 +44,4 @@ On your PSVita open VitaShell, press Select and write your IP and Port on the ap
 
 Then press Install.
 
-![Pic3](https://i.gyazo.com/046ca3d9d9f93f9f333a84c8ec2bcfdf.png)
-
-When this Message appears go to ux0:/VPKs on your PSVita and install the installer.vpk file.
-
-#When the installation finish press OK.
-
-Finally wait until the vpk is installed, this can be a lot of time depending on the game size and your connection.
+That's all! :)
